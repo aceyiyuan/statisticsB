@@ -101,4 +101,69 @@ mercury %>%
   ylab(expression(paste("Mercury concentration")))+
   theme_bw()
   
+#multilinear regression
+
+library(tidyverse)
+soilPh<-read_tsv("soilpH.txt")
+soilph.lm<-lm(pH~lat+age+tempsum+NO3,data=soilPh)
+summary(soilph.lm)
+
+
+#Residuals:
+ # Min       1Q      Median       3Q      Max 
+#-0.81629 -0.27096 -0.07196  0.14913  1.61360 
+
+# Coefficients:
+#   Estimate Std. Error t value Pr(>|t|)    
+# (Intercept) -5.199e+01  8.046e+00  -6.462 1.65e-09 ***
+#   lat          8.818e-01  1.246e-01   7.074 6.89e-11 ***
+#   age         -2.789e-03  7.877e-04  -3.541 0.000543 ***
+#   tempsum     -1.189e-01  7.949e-01  -0.150 0.881352    
+# NO3          1.014e-02  1.958e-03   5.180 7.70e-07 ***
+#   ---
+#   Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# 
+# Residual standard error: 0.4579 on 138 degrees of freedom
+# Multiple R-squared:  0.3734,	Adjusted R-squared:  0.3552 
+# F-statistic: 20.56 on 4 and 138 DF,  p-value: 2.629e-13
+
+plot(soilph.lm)
+soilPh%>%
+  ggplot(aes(x=NO3,y=pH))+
+  geom_point()
+library(car)
+crPlots(soilph.lm)
+
+#multicollinearity
+library(tidyverse)
+hillsrun<-read_tsv("hillsrun.txt")
+hillsrun%>%
+  select(-name)%>%
+  plot()
+install.packages("GGally")
+library(GGally)
+hillsrun %>%
+  select(-name)%>%
+  ggpairs()
+
+hillsrun.lm<-lm(time~dist+climb, data=hillsrun)
+summary(hillsrun.lm)
+
+hillsrunsdist.lm<-lm(time~dist, data=hillsrun)
+summary(hillsrunsdist.lm)
+
+hillsrunsclimb.lm<-lm(time~climb, data=hillsrun)
+summary(hillsrunsclimb.lm)
+vif(hillsrun.lm)
+#leverage observations
+
+time_dist.lm<-lm(time~dist, data=hillsrun)
+plot(time_dist.lm)
+view(hillsrun)
+hillsrun_new<-hillsrun%>%
+  filter(name!="Two Breweries")
+
+hillsrun_new.lm<-lm(time~dist+climb, data=hillsrun_new)
+summary(hillsrun_new.lm)
+plot(hillsrun_new.lm)
 
