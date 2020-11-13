@@ -55,7 +55,7 @@ summary(mercury.lm)
 plot(mercury.lm)
 #predictions
 predict(mercury.lm)
-new<-data.frame(length=400)
+new<-data.frame(length=600)
 predict(mercury.lm,newdata=new)
 #       1 
 #0.5535087 
@@ -79,7 +79,7 @@ predict(mercury.lm, newdata=new, interval = "prediction", level=0.99)
 
 #confidence and prediction bands can be produced in the following way: (see table new)
 
-new<-data.frame(length=315:400)
+new<-data.frame(length=315:500)
 new$conf<-predict(mercury.lm, newdata=new, interval="confidence")
 new$pred<-predict(mercury.lm, newdata=new, interval="prediction")
 
