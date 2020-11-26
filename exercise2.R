@@ -1,6 +1,64 @@
- 
+
+length<-read.csv2("length.csv")
+summary(length)
+
+hist(length$age)
+hist(length$parentLength)
+hist(length$length)
+
+onewayage<-aov(length ~ age, data = length)
+summary(onewayage)
+
+onewayparentLength<-aov(length ~ parentLength, data = length)
+summary(onewayparentLength)
+
+twowayanova<-aov(length ~ age + parentLength, data = length)
+
+summary(twowayanova)
+length.lm<-lm(length~age + parentLength, data = length)
+summary(length.lm)
+#anova(length.lm)
+
+#add interaction
+
+interaction <- aov(length ~ age*parentLength, data = length)
+
+summary(interaction)
+
+#find the best fit
+
+
+install.packages('AICcmodavg')
+library(AICcmodavg) 
+
+
+model.set <- list(onewayage, twowayanova, interaction)
+model.names <- c("onewayage", "twowayanova", "interaction")
+
+aictab(model.set, modnames = model.names) #the lowest AICc value  the better model (first line)
+# 
+# Model selection based on AICc:
+#   
+#               K AICc    Delta_AICc  AICcWt Cum.Wt     LL
+# onewayage   3 81.68       0.00      0.87   0.87     -35.84
+# twowayanova 4 85.53       3.84      0.13   1.00     -34.76
+# interaction 5 94.15      12.46      0.00   1.00     -34.57
+#Check for homoscedasticity
+plot(twowayanova)
+par(mfrow=c(1,1))
+
+plot(onewayage)
+
+install.packages("visreg")
+library(visreg)
+visreg2d(interaction,"age","parentLength")
+
+#=============== 
 install.packages("realxl")
 install.packages("tidyverse")
+
+
+
 
 #load libraries
 library(readxl)
@@ -16,7 +74,7 @@ install.packages("visreg")
 library(visreg)
 visreg2d(soilpH.interact,"NO3","tempsum")
 
-#One continous and one categorical explainatory variable
+#2. One continous and one categorical explainatory variable
 tooth<-read_tsv("toothgrowth.txt")
 tooth.lm1<-lm(len~supp+dose, data=tooth)
 summary(tooth.lm1)
@@ -50,9 +108,14 @@ summary(tooth.lm1)
 tooth%>%
   ggplot(aes(x=dose,y=len, col=supp))+
   geom_point()+
-  stat_smooth(method="lm")
+  stat_summary(fun=mean, geom="line")
 
+# or 
 
+tooth%>%
+  ggplot(aes(x=dose,y=len))+
+  geom_point()+
+  facet_wrap(~supp)
 tooth.lm3<-lm(len~supp+as.factor(dose),data=tooth)
 summary(tooth.lm3)
 
